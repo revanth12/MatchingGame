@@ -37,7 +37,15 @@ namespace MatchingGame
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            tenthOfSecondsElapsed++;
+            string quote = "TIME RUNS OUT"; 
+            timeTextBlock.Text = (   tenthOfSecondsElapsed / 10F).ToString("0.0s");
+            timeTextBlock.Text = quote + " - "+ timeTextBlock.Text;     
+            if (matchesFound == 8) 
+            { 
+                timer.Stop(); 
+                timeTextBlock.Text = timeTextBlock.Text + " - Play again?"; 
+            }
         }
 
         private void SetUpGame()
@@ -58,12 +66,16 @@ namespace MatchingGame
             
             foreach (TextBlock textBlock in mainGrid.Children.OfType<TextBlock>())
             {
-
-                int index = random.Next(animalEmojis.Count);
-                string nextEmoji = animalEmojis[index];
-                textBlock.Text = nextEmoji;
-                animalEmojis.RemoveAt(index); 
+                if (textBlock.Name != "timeTextBlock")
+                {
+                    int index = random.Next(animalEmojis.Count);
+                    string nextEmoji = animalEmojis[index];
+                    textBlock.Text = nextEmoji;
+                    animalEmojis.RemoveAt(index);
+                }
             }
+            timer.Start();
+            tenthOfSecondsElapsed = 0;matchesFound = 0 ;
         }
 
         
@@ -73,6 +85,8 @@ namespace MatchingGame
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         { 
             TextBlock textBlock = sender as TextBlock; 
+
+            
             if (findingMatch == false) 
             { 
                 textBlock.Visibility = Visibility.Hidden; 
@@ -80,7 +94,8 @@ namespace MatchingGame
                 findingMatch = true; 
             } 
             else if (textBlock.Text == lastTextBlockClikcked.Text) 
-            { 
+            {
+                matchesFound++;
                 textBlock.Visibility = Visibility.Hidden; 
                 findingMatch = false; 
             }
@@ -89,6 +104,15 @@ namespace MatchingGame
                 lastTextBlockClikcked.Visibility = Visibility.Visible;
                 findingMatch = false; 
             } 
+        }
+
+        private void TimeTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (matchesFound == 8)
+            {
+                SetUpGame();
+            }
+
         }
         
     }
